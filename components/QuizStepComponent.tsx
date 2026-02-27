@@ -95,19 +95,22 @@ export default function QuizStepComponent({
       return;
     }
 
-    // 모든 질문에 답변했는지 확인
-    const unanswered = step.questions.filter((q) => !answers[q.id]?.trim());
-    if (unanswered.length > 0) {
-      setAlertMessage("모든 질문에 답변해주세요.");
-      return;
-    }
-
     setLoading(true);
     const feedbackResults: Record<string, { score: number; feedback: string }> =
       {};
 
     try {
       for (const question of step.questions) {
+        const answer = answers[question.id]?.trim();
+
+        if (!answer) {
+          feedbackResults[question.id] = {
+            score: 0,
+            feedback: "미작성 답안은 0점 처리됩니다.",
+          };
+          continue;
+        }
+
         const response = await fetch("/api/grade", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -117,7 +120,7 @@ export default function QuizStepComponent({
             step: step.id,
             questionId: question.id,
             question: question.question,
-            answer: answers[question.id],
+            answer,
             correctAnswer: question.correctAnswer,
             maxScore: question.maxScore,
           }),
@@ -289,7 +292,7 @@ export default function QuizStepComponent({
                     ) : isSubmitted ? (
                       `재제출 (${2 - submitCount}회 남음)`
                     ) : (
-                      "제출"
+                      `제출 (${2 - submitCount}회 남음)`
                     )}
                   </Button>
                   <Button
