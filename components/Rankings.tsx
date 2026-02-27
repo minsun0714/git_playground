@@ -138,10 +138,33 @@ export default function Rankings({
     }
   }, [attemptId, hasMore, loading, rankings, shouldShowResultCard]);
 
-  const userRankFromList = attemptId
-    ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
-    : 0;
-  const userRank = userRankFromServer ?? userRankFromList;
+  const displayRanks = rankings.reduce<number[]>((acc, ranking, index) => {
+    if (
+      index > 0 &&
+      rankings[index - 1].total_score === ranking.total_score
+    ) {
+      acc.push(acc[index - 1]);
+    } else {
+      const previousRank = index > 0 ? acc[index - 1] : 0;
+      acc.push(previousRank + 1);
+    }
+
+    return acc;
+  }, []);
+
+  const userRankFromList = (() => {
+    if (!attemptId) {
+      return 0;
+    }
+
+    const rankingIndex = rankings.findIndex((r) => r.attempt_id === attemptId);
+    if (rankingIndex < 0) {
+      return 0;
+    }
+
+    return displayRanks[rankingIndex] || 0;
+  })();
+  const userRank = userRankFromList || userRankFromServer || 0;
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -201,6 +224,10 @@ export default function Rankings({
           >
             <div className="space-y-2">
               {rankings.map((ranking, index) => (
+                (() => {
+                  const displayRank = displayRanks[index] || index + 1;
+
+                  return (
                 <div
                   key={`${ranking.user_name}-${index}`}
                   ref={ranking.attempt_id === attemptId ? userRowRef : undefined}
@@ -213,16 +240,16 @@ export default function Rankings({
                   <div className="flex items-center gap-4">
                     <div
                       className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
-                        index === 0
+                        displayRank === 1
                           ? "bg-yellow-400 text-yellow-900"
-                          : index === 1
+                          : displayRank === 2
                             ? "bg-gray-300 text-gray-700"
-                            : index === 2
+                            : displayRank === 3
                               ? "bg-orange-400 text-orange-900"
                               : "bg-gray-200 text-gray-600"
                       }`}
                     >
-                      {index + 1}
+                      {displayRank}
                     </div>
                     <div>
                       <p className="font-semibold">{ranking.user_name}</p>
@@ -240,6 +267,8 @@ export default function Rankings({
                     <p className="text-xs text-gray-500">점</p>
                   </div>
                 </div>
+                  );
+                })()
               ))}
               {loading && (
                 <div className="flex justify-center py-4">
