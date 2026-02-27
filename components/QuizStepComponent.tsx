@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { QuizStep } from "@/lib/quiz-data";
 
@@ -42,6 +43,17 @@ export default function QuizStepComponent({
   onComplete,
   onUpdateData,
 }: QuizStepComponentProps) {
+  const isPreparationStep = currentStep === 0;
+  const progressTotalSteps = Math.max(totalSteps - 1, 0);
+  const completedProgressSteps = Math.min(
+    Math.max(currentStep, 0),
+    progressTotalSteps,
+  );
+  const progressPercent =
+    progressTotalSteps > 0
+      ? Math.round((completedProgressSteps / progressTotalSteps) * 100)
+      : 0;
+
   const [answers, setAnswers] = useState<Record<string, string>>(
     savedData?.answers || {},
   );
@@ -174,7 +186,9 @@ export default function QuizStepComponent({
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-500">
-              Step {currentStep + 1} / {totalSteps}
+              {isPreparationStep
+                ? "과제 전 준비"
+                : `Step ${currentStep} / ${progressTotalSteps}`}
             </span>
             <span className="text-sm font-medium text-blue-600">
               {userName}
@@ -183,8 +197,10 @@ export default function QuizStepComponent({
           <CardTitle className="text-2xl">{step.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {!isPreparationStep && <Progress value={progressPercent} />}
+
           {/* 단계 설명 */}
-          <div className="prose prose-sm max-w-none">
+          <div className="prose prose-sm max-w-none border rounded-lg p-4 bg-gray-50">
             <div className="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
               {step.content}
             </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UserIntro from "./UserIntro";
+import PreparationStep from "./PreparationStep";
 import QuizStepComponent from "./QuizStepComponent";
 import Rankings from "./Rankings";
 import { quizSteps } from "@/lib/quiz-data";
@@ -163,6 +164,17 @@ export default function QuizApp() {
   }
 
   if (stage === "quiz") {
+    if (currentStep === 0) {
+      return (
+        <PreparationStep
+          step={quizSteps[0]}
+          userName={userName}
+          onGoHome={handleGoHome}
+          onStartExam={() => setCurrentStep(1)}
+        />
+      );
+    }
+
     return (
       <QuizStepComponent
         step={quizSteps[currentStep]}
