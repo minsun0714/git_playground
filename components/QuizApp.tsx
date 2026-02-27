@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import UserIntro from "./UserIntro";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import PreparationStep from "./PreparationStep";
 import QuizStepComponent from "./QuizStepComponent";
 import Rankings from "./Rankings";
@@ -18,9 +17,13 @@ interface StepData {
   submitCount: number;
 }
 
-export default function QuizApp() {
+interface QuizAppProps {
+  initialName?: string;
+}
+
+export default function QuizApp({ initialName }: QuizAppProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const hasConsumedInitialNameRef = useRef(false);
   const [stage, setStage] = useState<QuizStage>("intro");
   const [userName, setUserName] = useState("");
   const [attemptId, setAttemptId] = useState("");
@@ -111,18 +114,36 @@ export default function QuizApp() {
   }, [attemptId, currentStep, isHydrated, stage, stepData, userName]);
 
   useEffect(() => {
+    if (
+      !isHydrated ||
+      stage !== "intro" ||
+      hasConsumedInitialNameRef.current
+    ) {
+      return;
+    }
+
+    const queryName = initialName?.trim();
+    if (!queryName) {
+      hasConsumedInitialNameRef.current = true;
+      return;
+    }
+
+    hasConsumedInitialNameRef.current = true;
+    handleStart(queryName);
+    window.history.replaceState(null, "", "/play");
+  }, [initialName, isHydrated, stage]);
+
+  useEffect(() => {
     if (!isHydrated || stage !== "intro") {
       return;
     }
 
-    const queryName = searchParams.get("name")?.trim();
-    if (!queryName) {
+    if (initialName?.trim()) {
       return;
     }
 
-    handleStart(queryName);
-    window.history.replaceState(null, "", "/play");
-  }, [isHydrated, searchParams, stage]);
+    router.replace("/");
+  }, [initialName, isHydrated, router, stage]);
 
   const handleStart = (name: string) => {
     setUserName(name);
@@ -175,7 +196,7 @@ export default function QuizApp() {
   }
 
   if (stage === "intro") {
-    return <UserIntro onStart={handleStart} onGoHome={handleGoHome} />;
+    return null;
   }
 
   if (stage === "quiz") {
