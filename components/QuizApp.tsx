@@ -39,17 +39,24 @@ export default function QuizApp() {
         stepData?: Record<number, StepData>;
       };
 
-      if (saved.stage === "intro" || saved.stage === "quiz" || saved.stage === "rankings") {
-        setStage(saved.stage);
+      const shouldRestoreQuiz =
+        saved.stage === "quiz" &&
+        typeof saved.userName === "string" &&
+        typeof saved.attemptId === "string";
+
+      if (!shouldRestoreQuiz) {
+        setStage("intro");
+        return;
       }
 
-      if (typeof saved.userName === "string") {
-        setUserName(saved.userName);
-      }
+      const restoredUserName = saved.userName as string;
+      const restoredAttemptId = saved.attemptId as string;
 
-      if (typeof saved.attemptId === "string") {
-        setAttemptId(saved.attemptId);
-      }
+      setStage("quiz");
+
+      setUserName(restoredUserName);
+
+      setAttemptId(restoredAttemptId);
 
       if (
         typeof saved.currentStep === "number" &&
@@ -71,6 +78,10 @@ export default function QuizApp() {
 
   useEffect(() => {
     if (!isHydrated) {
+      return;
+    }
+
+    if (stage !== "quiz") {
       return;
     }
 
@@ -107,6 +118,7 @@ export default function QuizApp() {
   };
 
   const handleComplete = () => {
+    localStorage.removeItem(QUIZ_STORAGE_KEY);
     setStage("rankings");
   };
 
@@ -145,6 +157,11 @@ export default function QuizApp() {
   }
 
   return (
-    <Rankings userName={userName} attemptId={attemptId} onRestart={handleRestart} />
+    <Rankings
+      userName={userName}
+      attemptId={attemptId}
+      showResultCard={Boolean(userName && attemptId)}
+      onRestart={handleRestart}
+    />
   );
 }

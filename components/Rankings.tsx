@@ -13,14 +13,16 @@ interface UserRanking {
 }
 
 interface RankingsProps {
-  userName: string;
-  attemptId: string;
-  onRestart: () => void;
+  userName?: string;
+  attemptId?: string;
+  showResultCard?: boolean;
+  onRestart?: () => void;
 }
 
 export default function Rankings({
   userName,
   attemptId,
+  showResultCard,
   onRestart,
 }: RankingsProps) {
   const [rankings, setRankings] = useState<UserRanking[]>([]);
@@ -29,6 +31,7 @@ export default function Rankings({
   const [hasMore, setHasMore] = useState(true);
   const [userScore, setUserScore] = useState<number | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
+  const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
 
   const fetchRankings = useCallback(async (pageNum: number) => {
     setLoading(true);
@@ -49,6 +52,10 @@ export default function Rankings({
   }, []);
 
   const completeQuiz = useCallback(async () => {
+    if (!userName || !attemptId) {
+      return;
+    }
+
     try {
       const response = await fetch("/api/complete", {
         method: "POST",
@@ -66,9 +73,11 @@ export default function Rankings({
   }, [attemptId, userName]);
 
   useEffect(() => {
-    completeQuiz();
+    if (shouldShowResultCard) {
+      completeQuiz();
+    }
     fetchRankings(1);
-  }, [completeQuiz, fetchRankings]);
+  }, [completeQuiz, fetchRankings, shouldShowResultCard]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -93,43 +102,56 @@ export default function Rankings({
     }
   }, [fetchRankings, hasMore, loading, page]);
 
-  const userRank = rankings.findIndex((r) => r.attempt_id === attemptId) + 1;
+  const userRank = attemptId
+    ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
+    : 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-lg mx-auto space-y-6">
       {/* 사용자 점수 카드 */}
-      <Card className="shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-        <CardHeader>
-          <CardTitle className="text-center text-3xl flex items-center justify-center gap-3">
-            <Trophy className="w-8 h-8" />
-            퀴즈 완료!
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <div>
-            <p className="text-lg opacity-90">{userName}님의 점수</p>
-            <p className="text-5xl font-bold mt-2">
-              {userScore !== null ? userScore : "계산 중..."}점
-            </p>
-          </div>
-          {userRank > 0 && (
-            <p className="text-xl opacity-90">전체 순위: {userRank}위</p>
-          )}
-          <Button
-            onClick={onRestart}
-            variant="secondary"
-            size="lg"
-            className="mt-4"
-          >
-            다시 시작하기
-          </Button>
-        </CardContent>
-      </Card>
+      {shouldShowResultCard && (
+        <Card className="shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+          <CardHeader>
+            <CardTitle className="text-center text-3xl flex items-center justify-center gap-3">
+              <Trophy className="w-8 h-8" />
+              퀴즈 완료!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div>
+              <p className="text-lg opacity-90">{userName}님의 점수</p>
+              <p className="text-5xl font-bold mt-2">
+                {userScore !== null ? userScore : "계산 중..."}점
+              </p>
+            </div>
+            {userRank > 0 && (
+              <p className="text-xl opacity-90">전체 순위: {userRank}위</p>
+            )}
+            {onRestart && (
+              <Button
+                onClick={onRestart}
+                variant="secondary"
+                size="lg"
+                className="mt-4"
+              >
+                다시 시작하기
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* 랭킹 리스트 */}
       <Card className="shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl">전체 랭킹</CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-2xl">전체 랭킹</CardTitle>
+            {!shouldShowResultCard && onRestart && (
+              <Button onClick={onRestart} variant="outline">
+                홈으로
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
