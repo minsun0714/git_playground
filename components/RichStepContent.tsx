@@ -1,0 +1,113 @@
+"use client";
+
+interface RichStepContentProps {
+  content: string;
+}
+
+interface ContentToken {
+  type: "text" | "codeBlock";
+  value: string;
+}
+
+function tokenizeContent(content: string): ContentToken[] {
+  const tokens: ContentToken[] = [];
+  const codeBlockRegex = /```(?:[\w-]+)?\n([\s\S]*?)```/g;
+
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = null;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    const [fullMatch, code] = match;
+    const startIndex = match.index;
+
+    if (startIndex > lastIndex) {
+      tokens.push({
+        type: "text",
+        value: content.slice(lastIndex, startIndex),
+      });
+    }
+
+    tokens.push({
+      type: "codeBlock",
+      value: code.trimEnd(),
+    });
+
+    lastIndex = startIndex + fullMatch.length;
+  }
+
+  if (lastIndex < content.length) {
+    tokens.push({
+      type: "text",
+      value: content.slice(lastIndex),
+    });
+  }
+
+  return tokens;
+}
+
+function renderInlineCode(text: string, keyPrefix: string) {
+  const inlineParts = text.split(/`([^`\n]+)`/g);
+
+  return inlineParts.map((part, index) => {
+    const key = `${keyPrefix}-${index}`;
+
+    if (index % 2 === 1) {
+      return (
+        <code
+          key={key}
+          className="mx-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary"
+        >
+          {part}
+        </code>
+      );
+    }
+
+    const stringParts = part.split(/"([^"\n]+)"/g);
+
+    return (
+      <span key={key} className="whitespace-pre-wrap">
+        {stringParts.map((stringPart, stringIndex) => {
+          const stringKey = `${key}-str-${stringIndex}`;
+
+          if (stringIndex % 2 === 1) {
+            return (
+              <span
+                key={stringKey}
+                className="mx-0.5 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary"
+              >
+                {"\""}
+                {stringPart}
+                {"\""}
+              </span>
+            );
+          }
+
+          return <span key={stringKey}>{stringPart}</span>;
+        })}
+      </span>
+    );
+  });
+}
+
+export default function RichStepContent({ content }: RichStepContentProps) {
+  const tokens = tokenizeContent(content);
+
+  return (
+    <div className="space-y-3 text-sm leading-relaxed">
+      {tokens.map((token, index) => {
+        if (token.type === "codeBlock") {
+          return (
+            <pre
+              key={`code-${index}`}
+              className="overflow-x-auto rounded-lg border bg-gray-900 p-3 text-xs text-gray-100"
+            >
+              <code>{token.value}</code>
+            </pre>
+          );
+        }
+
+        return <div key={`text-${index}`}>{renderInlineCode(token.value, `inline-${index}`)}</div>;
+      })}
+    </div>
+  );
+}

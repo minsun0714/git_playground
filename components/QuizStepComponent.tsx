@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import ActionModal from "@/components/ui/action-modal";
+import RichStepContent from "@/components/RichStepContent";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { QuizStep } from "@/lib/quiz-data";
 
@@ -186,9 +187,7 @@ export default function QuizStepComponent({
 
           {/* 단계 설명 */}
           <div className="prose prose-sm max-w-none border rounded-lg p-4 bg-gray-50">
-            <div className="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-              {step.content}
-            </div>
+            <RichStepContent content={step.content} />
           </div>
 
           {/* 질문들 */}

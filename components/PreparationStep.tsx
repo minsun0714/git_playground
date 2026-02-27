@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ActionModal from "@/components/ui/action-modal";
+import RichStepContent from "@/components/RichStepContent";
 import { QuizStep } from "@/lib/quiz-data";
 
 interface PreparationStepProps {
@@ -42,8 +43,8 @@ export default function PreparationStep({
           <CardTitle className="text-2xl">{step.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="prose prose-sm max-w-none border rounded-lg p-4 bg-gray-50 whitespace-pre-wrap">
-            {step.content}
+          <div className="prose prose-sm max-w-none border rounded-lg p-4 bg-gray-50">
+            <RichStepContent content={step.content} />
           </div>
 
           <div className="flex justify-end pt-4">
