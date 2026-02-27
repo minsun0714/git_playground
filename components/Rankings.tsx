@@ -30,7 +30,9 @@ export default function Rankings({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [userScore, setUserScore] = useState<number | null>(null);
-  const [userRank, setUserRank] = useState<number | null>(null);
+  const [userRankFromServer, setUserRankFromServer] = useState<number | null>(
+    null,
+  );
   const observerRef = useRef<HTMLDivElement>(null);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
 
@@ -68,7 +70,7 @@ export default function Rankings({
         const data = await response.json();
         setUserScore(data.totalScore);
         if (typeof data.rank === "number") {
-          setUserRank(data.rank);
+          setUserRankFromServer(data.rank);
         }
       }
     } catch (error) {
@@ -77,10 +79,15 @@ export default function Rankings({
   }, [attemptId, userName]);
 
   useEffect(() => {
-    if (shouldShowResultCard) {
-      completeQuiz();
-    }
-    fetchRankings(1);
+    const initialize = async () => {
+      if (shouldShowResultCard) {
+        await completeQuiz();
+      }
+      setPage(1);
+      await fetchRankings(1);
+    };
+
+    void initialize();
   }, [completeQuiz, fetchRankings, shouldShowResultCard]);
 
   useEffect(() => {
@@ -106,10 +113,10 @@ export default function Rankings({
     }
   }, [fetchRankings, hasMore, loading, page]);
 
-  const fallbackUserRank = attemptId
+  const userRankFromList = attemptId
     ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
     : 0;
-  const displayedUserRank = userRank ?? fallbackUserRank;
+  const userRank = userRankFromServer ?? userRankFromList;
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -129,8 +136,8 @@ export default function Rankings({
                 {userScore !== null ? userScore : "계산 중..."}점
               </p>
             </div>
-            {displayedUserRank > 0 && (
-              <p className="text-xl opacity-90">전체 순위: {displayedUserRank}위</p>
+            {userRank > 0 && (
+              <p className="text-xl opacity-90">전체 순위: {userRank}위</p>
             )}
             {onRestart && (
               <Button
