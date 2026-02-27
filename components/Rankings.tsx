@@ -35,6 +35,8 @@ export default function Rankings({
   );
   const listContainerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<HTMLDivElement>(null);
+  const userRowRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolledRef = useRef(false);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
 
   const fetchRankings = useCallback(async (pageNum: number) => {
@@ -118,6 +120,24 @@ export default function Rankings({
     }
   }, [fetchRankings, hasMore, loading, page]);
 
+  useEffect(() => {
+    if (!attemptId || !shouldShowResultCard || loading) {
+      return;
+    }
+
+    const hasCurrentAttempt = rankings.some((r) => r.attempt_id === attemptId);
+
+    if (!hasCurrentAttempt && hasMore) {
+      setPage((prev) => prev + 1);
+      return;
+    }
+
+    if (hasCurrentAttempt && userRowRef.current && !hasAutoScrolledRef.current) {
+      userRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      hasAutoScrolledRef.current = true;
+    }
+  }, [attemptId, hasMore, loading, rankings, shouldShowResultCard]);
+
   const userRankFromList = attemptId
     ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
     : 0;
@@ -179,6 +199,7 @@ export default function Rankings({
               {rankings.map((ranking, index) => (
                 <div
                   key={`${ranking.user_name}-${index}`}
+                  ref={ranking.attempt_id === attemptId ? userRowRef : undefined}
                   className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
                     ranking.attempt_id === attemptId
                       ? "bg-primary/10 border-2 border-primary"
