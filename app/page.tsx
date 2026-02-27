@@ -6,7 +6,7 @@ import Rankings from "@/components/Rankings";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <main className="container mx-auto px-4 py-8">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8 md:flex-row md:items-start md:justify-center">
           <div className="order-2 w-full md:order-1 md:w-[34rem] md:shrink-0">
