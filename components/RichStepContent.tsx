@@ -89,6 +89,41 @@ function renderInlineCode(text: string, keyPrefix: string) {
   });
 }
 
+function renderTextContent(text: string, keyPrefix: string) {
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-2">
+      {lines.map((line, lineIndex) => {
+        const trimmedLine = line.trim();
+        const commandOnlyMatch = trimmedLine.match(/^`([^`\n]+)`$/);
+        const key = `${keyPrefix}-line-${lineIndex}`;
+
+        if (commandOnlyMatch) {
+          return (
+            <pre
+              key={key}
+              className="w-full overflow-x-auto rounded-lg border bg-gray-900 p-3 text-xs text-gray-100"
+            >
+              <code>{commandOnlyMatch[1]}</code>
+            </pre>
+          );
+        }
+
+        if (trimmedLine.length === 0) {
+          return <div key={key} className="h-1" />;
+        }
+
+        return (
+          <div key={key} className="whitespace-pre-wrap">
+            {renderInlineCode(line, key)}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function RichStepContent({ content }: RichStepContentProps) {
   const tokens = tokenizeContent(content);
 
@@ -106,7 +141,11 @@ export default function RichStepContent({ content }: RichStepContentProps) {
           );
         }
 
-        return <div key={`text-${index}`}>{renderInlineCode(token.value, `inline-${index}`)}</div>;
+        return (
+          <div key={`text-${index}`}>
+            {renderTextContent(token.value, `inline-${index}`)}
+          </div>
+        );
       })}
     </div>
   );
