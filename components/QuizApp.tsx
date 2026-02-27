@@ -114,11 +114,7 @@ export default function QuizApp({ initialName }: QuizAppProps) {
   }, [attemptId, currentStep, isHydrated, stage, stepData, userName]);
 
   useEffect(() => {
-    if (
-      !isHydrated ||
-      stage !== "intro" ||
-      hasConsumedInitialNameRef.current
-    ) {
+    if (!isHydrated || stage !== "intro" || hasConsumedInitialNameRef.current) {
       return;
     }
 

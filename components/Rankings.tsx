@@ -53,7 +53,8 @@ export default function Rankings({
     }
 
     const nearBottom =
-      container.scrollTop + container.clientHeight >= container.scrollHeight - 80;
+      container.scrollTop + container.clientHeight >=
+      container.scrollHeight - 80;
 
     if (nearBottom) {
       enqueueNextPage();
@@ -156,17 +157,28 @@ export default function Rankings({
       return;
     }
 
-    if (hasCurrentAttempt && userRowRef.current && !hasAutoScrolledRef.current) {
-      userRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (
+      hasCurrentAttempt &&
+      userRowRef.current &&
+      !hasAutoScrolledRef.current
+    ) {
+      userRowRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       hasAutoScrolledRef.current = true;
     }
-  }, [attemptId, enqueueNextPage, hasMore, loading, rankings, shouldShowResultCard]);
+  }, [
+    attemptId,
+    enqueueNextPage,
+    hasMore,
+    loading,
+    rankings,
+    shouldShowResultCard,
+  ]);
 
   const displayRanks = rankings.reduce<number[]>((acc, ranking, index) => {
-    if (
-      index > 0 &&
-      rankings[index - 1].total_score === ranking.total_score
-    ) {
+    if (index > 0 && rankings[index - 1].total_score === ranking.total_score) {
       acc.push(acc[index - 1]);
     } else {
       const previousRank = index > 0 ? acc[index - 1] : 0;
@@ -249,53 +261,57 @@ export default function Rankings({
             onScroll={handleContainerScroll}
           >
             <div className="space-y-2">
-              {rankings.map((ranking, index) => (
+              {rankings.map((ranking, index) =>
                 (() => {
                   const displayRank = displayRanks[index] || index + 1;
 
                   return (
-                <div
-                  key={`${ranking.user_name}-${index}`}
-                  ref={ranking.attempt_id === attemptId ? userRowRef : undefined}
-                  className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
-                    ranking.attempt_id === attemptId
-                      ? "bg-primary/10 border-2 border-primary"
-                      : "bg-gray-50 hover:bg-gray-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
                     <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
-                        displayRank === 1
-                          ? "bg-yellow-400 text-yellow-900"
-                          : displayRank === 2
-                            ? "bg-gray-300 text-gray-700"
-                            : displayRank === 3
-                              ? "bg-orange-400 text-orange-900"
-                              : "bg-gray-200 text-gray-600"
+                      key={`${ranking.user_name}-${index}`}
+                      ref={
+                        ranking.attempt_id === attemptId
+                          ? userRowRef
+                          : undefined
+                      }
+                      className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
+                        ranking.attempt_id === attemptId
+                          ? "bg-primary/10 border-2 border-primary"
+                          : "bg-gray-50 hover:bg-gray-100"
                       }`}
                     >
-                      {displayRank}
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
+                            displayRank === 1
+                              ? "bg-yellow-400 text-yellow-900"
+                              : displayRank === 2
+                                ? "bg-gray-300 text-gray-700"
+                                : displayRank === 3
+                                  ? "bg-orange-400 text-orange-900"
+                                  : "bg-gray-200 text-gray-600"
+                          }`}
+                        >
+                          {displayRank}
+                        </div>
+                        <div>
+                          <p className="font-semibold">{ranking.user_name}</p>
+                          <p className="text-sm text-gray-500">
+                            {new Date(ranking.completed_at).toLocaleDateString(
+                              "ko-KR",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-primary">
+                          {ranking.total_score}
+                        </p>
+                        <p className="text-xs text-gray-500">점</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold">{ranking.user_name}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(ranking.completed_at).toLocaleDateString(
-                          "ko-KR",
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
-                      {ranking.total_score}
-                    </p>
-                    <p className="text-xs text-gray-500">점</p>
-                  </div>
-                </div>
                   );
-                })()
-              ))}
+                })(),
+              )}
               <div className="h-4" />
               {isLoadingMore && (
                 <div className="sticky bottom-0 z-10 flex justify-center bg-background/90 py-3 backdrop-blur-sm">
