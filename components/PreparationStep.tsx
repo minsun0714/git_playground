@@ -41,7 +41,7 @@ export default function PreparationStep({
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-500">과제 전 준비</span>
-            <span className="text-sm font-medium text-blue-600">{userName}</span>
+            <span className="text-sm font-medium text-primary">{userName}</span>
           </div>
           <CardTitle className="text-2xl">{step.title}</CardTitle>
         </CardHeader>

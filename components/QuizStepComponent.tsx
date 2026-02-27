@@ -190,7 +190,7 @@ export default function QuizStepComponent({
                 ? "과제 전 준비"
                 : `Step ${currentStep} / ${progressTotalSteps}`}
             </span>
-            <span className="text-sm font-medium text-blue-600">
+            <span className="text-sm font-medium text-primary">
               {userName}
             </span>
           </div>
@@ -239,14 +239,14 @@ export default function QuizStepComponent({
                     />
                   )}
                   {feedback[question.id] && (
-                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold text-blue-900">
+                        <span className="font-semibold text-primary">
                           점수: {feedback[question.id].score} /{" "}
                           {question.maxScore}
                         </span>
                       </div>
-                      <p className="text-sm text-blue-800">
+                      <p className="text-sm text-foreground">
                         {feedback[question.id].feedback}
                       </p>
                     </div>

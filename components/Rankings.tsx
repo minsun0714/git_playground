@@ -115,7 +115,7 @@ export default function Rankings({
     <div className="w-full max-w-lg mx-auto space-y-6">
       {/* 사용자 점수 카드 */}
       {shouldShowResultCard && (
-        <Card className="shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+        <Card className="shadow-xl bg-primary text-primary-foreground">
           <CardHeader>
             <CardTitle className="text-center text-3xl flex items-center justify-center gap-3">
               <Trophy className="w-8 h-8" />
@@ -165,7 +165,7 @@ export default function Rankings({
                 key={`${ranking.user_name}-${index}`}
                 className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
                   ranking.attempt_id === attemptId
-                    ? "bg-blue-100 border-2 border-blue-500"
+                    ? "bg-primary/10 border-2 border-primary"
                     : "bg-gray-50 hover:bg-gray-100"
                 }`}
               >
@@ -193,7 +193,7 @@ export default function Rankings({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-primary">
                     {ranking.total_score}
                   </p>
                   <p className="text-xs text-gray-500">점</p>
@@ -202,7 +202,7 @@ export default function Rankings({
             ))}
             {loading && (
               <div className="flex justify-center py-4">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
               </div>
             )}
             <div ref={observerRef} className="h-4" />

@@ -6,7 +6,7 @@ import Rankings from "@/components/Rankings";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8 md:flex-row md:items-start md:justify-center">
           <div className="order-2 w-full md:order-1 md:w-[34rem] md:shrink-0">
@@ -17,8 +17,8 @@ export default function Home() {
             <Card className="w-full max-w-md shadow-xl">
               <CardHeader className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="p-4 bg-blue-100 rounded-full">
-                    <GitBranch className="w-12 h-12 text-blue-600" />
+                  <div className="p-4 bg-primary/10 rounded-full">
+                    <GitBranch className="w-12 h-12 text-primary" />
                   </div>
                 </div>
                 <CardTitle className="text-3xl font-bold">

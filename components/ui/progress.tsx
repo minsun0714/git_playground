@@ -15,10 +15,9 @@ export function Progress({ value = 0, className, ...props }: ProgressProps) {
     <div
       data-slot="progress"
       className={cn(
-        "relative h-3 w-full overflow-hidden rounded-full border border-border bg-muted",
+        "relative h-3 w-full overflow-hidden rounded-full border border-primary/20 bg-primary/10",
         className,
       )}
-      style={{ backgroundColor: "#e5e7eb" }}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -28,7 +27,7 @@ export function Progress({ value = 0, className, ...props }: ProgressProps) {
       <div
         data-slot="progress-indicator"
         className="h-full rounded-full bg-primary transition-all duration-300"
-        style={{ width: indicatorWidth, backgroundColor: "#2563eb" }}
+        style={{ width: indicatorWidth }}
       />
     </div>
   );
