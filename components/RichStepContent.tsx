@@ -55,7 +55,7 @@ function renderInlineCode(text: string, keyPrefix: string) {
       return (
         <code
           key={key}
-          className="mx-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary"
+          className="mx-0.5 rounded border border-sky-800 bg-slate-900 px-1.5 py-0.5 font-mono text-[0.9em] text-sky-200"
         >
           {part}
         </code>
@@ -73,7 +73,7 @@ function renderInlineCode(text: string, keyPrefix: string) {
             return (
               <span
                 key={stringKey}
-                className="mx-0.5 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary"
+                className="mx-0.5 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[0.9em] text-amber-900"
               >
                 {"\""}
                 {stringPart}

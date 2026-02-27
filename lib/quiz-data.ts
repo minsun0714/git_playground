@@ -121,7 +121,7 @@ git init
     title: "Step 4 — restore",
     content: `Step3에서 "initial change"를 커밋했다.
 이제 "initial change"를 "next change"로 수정하라. 아직 add는 하지 않았다.
-그런데 next라는 단어를 괜히 쓴 거 같다. 변경 사항을 취소하고 다시 working directory의 내용을 initial로 바꾸고 싶다.`,
+그런데 next라는 단어를 괜히 쓴 거 같다. 변경 사항을 취소하고 다시 working directory의 내용을 "initial"로 바꾸고 싶다.`,
     questions: [
       {
         id: "step4-q1",
