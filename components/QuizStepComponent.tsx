@@ -24,6 +24,7 @@ interface QuizStepComponentProps {
   savedData?: StepData;
   onNext: () => void;
   onPrevious: () => void;
+  onGoHome: () => void;
   onComplete: () => void;
   onUpdateData: (data: StepData) => void;
 }
@@ -37,6 +38,7 @@ export default function QuizStepComponent({
   savedData,
   onNext,
   onPrevious,
+  onGoHome,
   onComplete,
   onUpdateData,
 }: QuizStepComponentProps) {
@@ -143,18 +145,42 @@ export default function QuizStepComponent({
     }
   };
 
+  const handleGoHomeClick = () => {
+    const confirmed = window.confirm(
+      "홈으로 이동하면 지금까지 제출한 데이터가 모두 사라집니다. 계속하시겠습니까?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    onGoHome();
+  };
+
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-xl">
-      <CardHeader>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-500">
-            Step {currentStep + 1} / {totalSteps}
-          </span>
-          <span className="text-sm font-medium text-blue-600">{userName}</span>
-        </div>
-        <CardTitle className="text-2xl">{step.title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-3">
+      <div className="flex justify-start">
+        <Button
+          onClick={handleGoHomeClick}
+          variant="outline"
+          size="sm"
+          disabled={loading}
+        >
+          홈으로
+        </Button>
+      </div>
+
+      <Card className="shadow-xl">
+        <CardHeader>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-500">
+              Step {currentStep + 1} / {totalSteps}
+            </span>
+            <span className="text-sm font-medium text-blue-600">{userName}</span>
+          </div>
+          <CardTitle className="text-2xl">{step.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
         {/* 단계 설명 */}
         <div className="prose prose-sm max-w-none">
           <div className="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
@@ -260,7 +286,8 @@ export default function QuizStepComponent({
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import UserIntro from "./UserIntro";
 import QuizStepComponent from "./QuizStepComponent";
 import Rankings from "./Rankings";
@@ -17,6 +18,7 @@ interface StepData {
 }
 
 export default function QuizApp() {
+  const router = useRouter();
   const [stage, setStage] = useState<QuizStage>("intro");
   const [userName, setUserName] = useState("");
   const [attemptId, setAttemptId] = useState("");
@@ -38,6 +40,17 @@ export default function QuizApp() {
         currentStep?: number;
         stepData?: Record<number, StepData>;
       };
+
+      const navigationEntry = performance
+        .getEntriesByType("navigation")
+        .at(0) as PerformanceNavigationTiming | undefined;
+      const isReload = navigationEntry?.type === "reload";
+
+      if (!isReload) {
+        localStorage.removeItem(QUIZ_STORAGE_KEY);
+        setStage("intro");
+        return;
+      }
 
       const shouldRestoreQuiz =
         saved.stage === "quiz" &&
@@ -131,6 +144,16 @@ export default function QuizApp() {
     localStorage.removeItem(QUIZ_STORAGE_KEY);
   };
 
+  const handleGoHome = () => {
+    setStage("intro");
+    setUserName("");
+    setAttemptId("");
+    setCurrentStep(0);
+    setStepData({});
+    localStorage.removeItem(QUIZ_STORAGE_KEY);
+    router.push("/");
+  };
+
   if (!isHydrated) {
     return null;
   }
@@ -150,6 +173,7 @@ export default function QuizApp() {
         savedData={stepData[currentStep]}
         onNext={handleNext}
         onPrevious={handlePrevious}
+        onGoHome={handleGoHome}
         onComplete={handleComplete}
         onUpdateData={(data) => updateStepData(currentStep, data)}
       />
