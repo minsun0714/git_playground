@@ -24,16 +24,21 @@ export default function UserIntro({ onStart, onGoHome }: UserIntroProps) {
   return (
     <div className="w-full max-w-md mx-auto space-y-3">
       <div className="flex justify-start">
-        <Button onClick={onGoHome} variant="outline" size="sm">
-          홈으로
+        <Button
+          onClick={onGoHome}
+          variant="ghost"
+          size="sm"
+          className="px-0 hover:bg-transparent"
+        >
+          &lt; 홈으로
         </Button>
       </div>
 
       <Card className="shadow-xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="p-4 bg-primary/10 rounded-full">
-              <GitBranch className="w-12 h-12 text-primary" />
+            <div className="p-4 bg-blue-100 rounded-full">
+              <GitBranch className="w-12 h-12 text-blue-600" />
             </div>
           </div>
           <CardTitle className="text-3xl font-bold">Git 학습 퀴즈</CardTitle>

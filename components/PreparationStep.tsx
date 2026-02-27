@@ -29,8 +29,13 @@ export default function PreparationStep({
   return (
     <div className="w-full max-w-4xl mx-auto space-y-3">
       <div className="flex justify-start">
-        <Button onClick={handleGoHomeClick} variant="outline" size="sm">
-          홈으로
+        <Button
+          onClick={handleGoHomeClick}
+          variant="ghost"
+          size="sm"
+          className="px-0 hover:bg-transparent"
+        >
+          &lt; 홈으로
         </Button>
       </div>
 

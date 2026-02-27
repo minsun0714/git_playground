@@ -167,11 +167,12 @@ export default function QuizStepComponent({
       <div className="flex justify-start">
         <Button
           onClick={handleGoHomeClick}
-          variant="outline"
+          variant="ghost"
           size="sm"
+          className="px-0 hover:bg-transparent"
           disabled={loading}
         >
-          홈으로
+          &lt; 홈으로
         </Button>
       </div>
 

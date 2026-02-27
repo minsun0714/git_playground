@@ -184,8 +184,12 @@ export default function Rankings({
           <div className="flex items-center justify-between gap-3">
             <CardTitle className="text-2xl">전체 랭킹</CardTitle>
             {!shouldShowResultCard && onRestart && (
-              <Button onClick={onRestart} variant="outline">
-                홈으로
+              <Button
+                onClick={onRestart}
+                variant="ghost"
+                className="px-0 hover:bg-transparent"
+              >
+                &lt; 홈으로
               </Button>
             )}
           </div>
