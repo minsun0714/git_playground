@@ -159,7 +159,7 @@ export default function QuizApp() {
   }
 
   if (stage === "intro") {
-    return <UserIntro onStart={handleStart} />;
+    return <UserIntro onStart={handleStart} onGoHome={handleGoHome} />;
   }
 
   if (stage === "quiz") {

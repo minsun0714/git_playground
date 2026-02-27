@@ -8,9 +8,10 @@ import { GitBranch } from "lucide-react";
 
 interface UserIntroProps {
   onStart: (userName: string) => void;
+  onGoHome: () => void;
 }
 
-export default function UserIntro({ onStart }: UserIntroProps) {
+export default function UserIntro({ onStart, onGoHome }: UserIntroProps) {
   const [name, setName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -21,8 +22,14 @@ export default function UserIntro({ onStart }: UserIntroProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh]">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="w-full max-w-md mx-auto space-y-3">
+      <div className="flex justify-start">
+        <Button onClick={onGoHome} variant="outline" size="sm">
+          홈으로
+        </Button>
+      </div>
+
+      <Card className="shadow-xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
             <div className="p-4 bg-blue-100 rounded-full">
