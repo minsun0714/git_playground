@@ -22,12 +22,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        {children}
+        <main className="flex-1 pb-16">{children}</main>
+        <footer className="fixed bottom-0 left-0 w-full border-t bg-white/90 backdrop-blur">
+          <div className="container mx-auto px-4 py-4 text-sm text-gray-600 text-center">
+            © {currentYear} Lee Minsun. All rights reserved.
+          </div>
+        </footer>
       </body>
     </html>
   );
