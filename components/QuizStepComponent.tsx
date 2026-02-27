@@ -164,7 +164,7 @@ export default function QuizStepComponent({
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-3">
-      <div className="flex justify-start">
+      <div className="flex items-start justify-between">
         <Button
           onClick={handleGoHomeClick}
           variant="ghost"
@@ -174,16 +174,31 @@ export default function QuizStepComponent({
         >
           &lt; 홈으로
         </Button>
+
+        <div className="relative h-[4.6rem] w-44 shrink-0" aria-hidden>
+          <span className="absolute left-1/2 top-0 -translate-x-1/2 text-3xl leading-none transition-transform duration-300 hover:-translate-y-0.5">
+            ʕ•ᴥ•ʔ
+          </span>
+          <div className="absolute left-1/2 top-8 -translate-x-1/2 rounded-xl bg-background/80 px-3 py-1 text-sm font-semibold">
+            {userName}
+          </div>
+          <span className="absolute left-9 top-[2.1rem] -rotate-12 text-lg leading-none">
+            ᕦ
+          </span>
+          <span className="absolute right-9 top-[2.1rem] rotate-12 text-lg leading-none">
+            ᕤ
+          </span>
+          <div className="absolute left-[36%] top-[1.9rem] h-2 w-px bg-foreground/20" />
+          <div className="absolute left-[64%] top-[1.9rem] h-2 w-px bg-foreground/20" />
+          <div className="sr-only">응시자: {userName}</div>
+        </div>
       </div>
 
       <Card className="shadow-xl">
         <CardHeader>
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <span className="text-sm text-gray-500">
               Step {displayedCurrentStep} / {displayedTotalSteps}
-            </span>
-            <span className="text-sm font-medium text-blue-600">
-              {userName}
             </span>
           </div>
           <Progress value={progressPercent} />

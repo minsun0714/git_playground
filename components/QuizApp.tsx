@@ -121,6 +121,7 @@ export default function QuizApp() {
     }
 
     handleStart(queryName);
+    window.history.replaceState(null, "", "/play");
   }, [isHydrated, searchParams, stage]);
 
   const handleStart = (name: string) => {
