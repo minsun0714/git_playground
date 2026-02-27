@@ -1,8 +1,5 @@
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { GitBranch } from "lucide-react";
 import Rankings from "@/components/Rankings";
+import HomeNameEntry from "@/components/HomeNameEntry";
 
 export default function Home() {
   return (
@@ -14,25 +11,7 @@ export default function Home() {
           </div>
 
           <div className="order-1 flex w-full items-center justify-center lg:order-2 lg:w-[32rem] lg:shrink-0">
-            <Card className="w-full max-w-lg shadow-xl">
-              <CardHeader className="text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="p-4 bg-primary/10 rounded-full">
-                    <GitBranch className="w-12 h-12 text-primary" />
-                  </div>
-                </div>
-                <CardTitle className="text-3xl font-bold">
-                  Git 학습 퀴즈
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link href="/play" className="block">
-                  <Button className="w-full" size="lg">
-                    응시하기
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <HomeNameEntry />
           </div>
         </div>
       </main>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import UserIntro from "./UserIntro";
 import PreparationStep from "./PreparationStep";
 import QuizStepComponent from "./QuizStepComponent";
@@ -20,6 +20,7 @@ interface StepData {
 
 export default function QuizApp() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [stage, setStage] = useState<QuizStage>("intro");
   const [userName, setUserName] = useState("");
   const [attemptId, setAttemptId] = useState("");
@@ -108,6 +109,19 @@ export default function QuizApp() {
       console.error("퀴즈 진행 상태 저장 실패:", error);
     }
   }, [attemptId, currentStep, isHydrated, stage, stepData, userName]);
+
+  useEffect(() => {
+    if (!isHydrated || stage !== "intro") {
+      return;
+    }
+
+    const queryName = searchParams.get("name")?.trim();
+    if (!queryName) {
+      return;
+    }
+
+    handleStart(queryName);
+  }, [isHydrated, searchParams, stage]);
 
   const handleStart = (name: string) => {
     setUserName(name);
