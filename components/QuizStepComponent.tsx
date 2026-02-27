@@ -176,116 +176,121 @@ export default function QuizStepComponent({
             <span className="text-sm text-gray-500">
               Step {currentStep + 1} / {totalSteps}
             </span>
-            <span className="text-sm font-medium text-blue-600">{userName}</span>
+            <span className="text-sm font-medium text-blue-600">
+              {userName}
+            </span>
           </div>
           <CardTitle className="text-2xl">{step.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-        {/* 단계 설명 */}
-        <div className="prose prose-sm max-w-none">
-          <div className="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
-            {step.content}
+          {/* 단계 설명 */}
+          <div className="prose prose-sm max-w-none">
+            <div className="bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
+              {step.content}
+            </div>
           </div>
-        </div>
 
-        {/* 질문들 */}
-        {step.questions.length > 0 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">질문</h3>
-            {step.questions.map((question, index) => (
-              <div key={question.id} className="space-y-3">
-                <label className="block text-sm font-medium">
-                  {index + 1}. {question.question}
-                  <span className="text-xs text-gray-500 ml-2">
-                    (배점: {question.maxScore}점)
-                  </span>
-                </label>
-                {question.type === "short" ? (
-                  <Input
-                    value={answers[question.id] || ""}
-                    onChange={(e) =>
-                      handleAnswerChange(question.id, e.target.value)
-                    }
-                    placeholder="답변을 입력하세요"
-                    disabled={loading}
-                  />
-                ) : (
-                  <Textarea
-                    value={answers[question.id] || ""}
-                    onChange={(e) =>
-                      handleAnswerChange(question.id, e.target.value)
-                    }
-                    placeholder="답변을 입력하세요"
-                    rows={4}
-                    disabled={loading}
-                  />
-                )}
-                {feedback[question.id] && (
-                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-blue-900">
-                        점수: {feedback[question.id].score} /{" "}
-                        {question.maxScore}
-                      </span>
-                    </div>
-                    <p className="text-sm text-blue-800">
-                      {feedback[question.id].feedback}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 네비게이션 버튼 */}
-        <div className="flex justify-between pt-4">
-          <Button
-            onClick={onPrevious}
-            disabled={currentStep === 0 || loading}
-            variant="outline"
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            이전
-          </Button>
-
-          <div className="flex gap-3">
-            {step.questions.length > 0 ? (
-              <>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={loading || submitCount >= 2}
-                  variant={isSubmitted ? "secondary" : "default"}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      채점 중...
-                    </>
-                  ) : submitCount >= 2 ? (
-                    "제출 완료"
-                  ) : isSubmitted ? (
-                    `재제출 (${2 - submitCount}회 남음)`
+          {/* 질문들 */}
+          {step.questions.length > 0 && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold">질문</h3>
+              {step.questions.map((question, index) => (
+                <div key={question.id} className="space-y-3">
+                  <label className="block text-sm font-medium">
+                    {index + 1}. {question.question}
+                    <span className="text-xs text-gray-500 ml-2">
+                      (배점: {question.maxScore}점)
+                    </span>
+                  </label>
+                  {question.type === "short" ? (
+                    <Input
+                      value={answers[question.id] || ""}
+                      onChange={(e) =>
+                        handleAnswerChange(question.id, e.target.value)
+                      }
+                      placeholder="답변을 입력하세요"
+                      disabled={loading}
+                    />
                   ) : (
-                    "제출"
+                    <Textarea
+                      value={answers[question.id] || ""}
+                      onChange={(e) =>
+                        handleAnswerChange(question.id, e.target.value)
+                      }
+                      placeholder="답변을 입력하세요"
+                      rows={4}
+                      disabled={loading}
+                    />
                   )}
-                </Button>
-                <Button onClick={handleNext} disabled={!isSubmitted || loading}>
-                  {currentStep === totalSteps - 1 ? "완료" : "다음"}
+                  {feedback[question.id] && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-blue-900">
+                          점수: {feedback[question.id].score} /{" "}
+                          {question.maxScore}
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        {feedback[question.id].feedback}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 네비게이션 버튼 */}
+          <div className="flex justify-between pt-4">
+            <Button
+              onClick={onPrevious}
+              disabled={currentStep === 0 || loading}
+              variant="outline"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              이전
+            </Button>
+
+            <div className="flex gap-3">
+              {step.questions.length > 0 ? (
+                <>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={loading || submitCount >= 2}
+                    variant={isSubmitted ? "secondary" : "default"}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        채점 중...
+                      </>
+                    ) : submitCount >= 2 ? (
+                      "제출 완료"
+                    ) : isSubmitted ? (
+                      `재제출 (${2 - submitCount}회 남음)`
+                    ) : (
+                      "제출"
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    disabled={!isSubmitted || loading}
+                  >
+                    {currentStep === totalSteps - 1 ? "완료" : "다음"}
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={currentStep === totalSteps - 1}
+                >
+                  다음
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
-              </>
-            ) : (
-              <Button
-                onClick={handleNext}
-                disabled={currentStep === totalSteps - 1}
-              >
-                다음
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
         </CardContent>
       </Card>
     </div>
