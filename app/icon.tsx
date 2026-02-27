@@ -17,14 +17,30 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#7C3AED",
-          color: "white",
-          fontSize: 20,
-          fontWeight: 800,
-          borderRadius: 8,
+          background: "transparent",
         }}
       >
-        G
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 64 64"
+          width="32"
+          height="32"
+          fill="none"
+        >
+          <circle cx="32" cy="32" r="28" fill="#EDE9FE" />
+          <g
+            transform="translate(14 14) scale(1.5)"
+            stroke="#7C3AED"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          >
+            <path d="M15 6a9 9 0 0 0-9 9V3" />
+            <circle cx="18" cy="6" r="3" />
+            <circle cx="6" cy="18" r="3" />
+          </g>
+        </svg>
       </div>
     ),
     {
