@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ActionModal from "@/components/ui/action-modal";
 import { QuizStep } from "@/lib/quiz-data";
 
 interface PreparationStepProps {
@@ -17,16 +19,10 @@ export default function PreparationStep({
   onGoHome,
   onStartExam,
 }: PreparationStepProps) {
+  const [isHomeConfirmOpen, setIsHomeConfirmOpen] = useState(false);
+
   const handleGoHomeClick = () => {
-    const confirmed = window.confirm(
-      "홈으로 이동하면 지금까지 제출한 데이터가 모두 사라집니다. 계속하시겠습니까?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    onGoHome();
+    setIsHomeConfirmOpen(true);
   };
 
   return (
@@ -57,6 +53,19 @@ export default function PreparationStep({
           </div>
         </CardContent>
       </Card>
+
+      <ActionModal
+        open={isHomeConfirmOpen}
+        title="홈으로 이동"
+        description="홈으로 이동하면 지금까지 제출한 데이터가 모두 사라집니다. 계속하시겠습니까?"
+        confirmText="이동"
+        cancelText="취소"
+        onConfirm={() => {
+          setIsHomeConfirmOpen(false);
+          onGoHome();
+        }}
+        onCancel={() => setIsHomeConfirmOpen(false)}
+      />
     </div>
   );
 }
