@@ -33,6 +33,7 @@ export default function Rankings({
   const [userRankFromServer, setUserRankFromServer] = useState<number | null>(
     null,
   );
+  const listContainerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<HTMLDivElement>(null);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
 
@@ -91,13 +92,17 @@ export default function Rankings({
   }, [completeQuiz, fetchRankings, shouldShowResultCard]);
 
   useEffect(() => {
+    if (!listContainerRef.current) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
           setPage((prev) => prev + 1);
         }
       },
-      { threshold: 0.1 },
+      { root: listContainerRef.current, threshold: 0.1 },
     );
 
     if (observerRef.current) {
@@ -166,53 +171,58 @@ export default function Rankings({
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {rankings.map((ranking, index) => (
-              <div
-                key={`${ranking.user_name}-${index}`}
-                className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
-                  ranking.attempt_id === attemptId
-                    ? "bg-primary/10 border-2 border-primary"
-                    : "bg-gray-50 hover:bg-gray-100"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
-                      index === 0
-                        ? "bg-yellow-400 text-yellow-900"
-                        : index === 1
-                          ? "bg-gray-300 text-gray-700"
-                          : index === 2
-                            ? "bg-orange-400 text-orange-900"
-                            : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    {index + 1}
+          <div
+            ref={listContainerRef}
+            className="h-[420px] overflow-y-auto pr-1"
+          >
+            <div className="space-y-2">
+              {rankings.map((ranking, index) => (
+                <div
+                  key={`${ranking.user_name}-${index}`}
+                  className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
+                    ranking.attempt_id === attemptId
+                      ? "bg-primary/10 border-2 border-primary"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
+                        index === 0
+                          ? "bg-yellow-400 text-yellow-900"
+                          : index === 1
+                            ? "bg-gray-300 text-gray-700"
+                            : index === 2
+                              ? "bg-orange-400 text-orange-900"
+                              : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{ranking.user_name}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(ranking.completed_at).toLocaleDateString(
+                          "ko-KR",
+                        )}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold">{ranking.user_name}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(ranking.completed_at).toLocaleDateString(
-                        "ko-KR",
-                      )}
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">
+                      {ranking.total_score}
                     </p>
+                    <p className="text-xs text-gray-500">점</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">
-                    {ranking.total_score}
-                  </p>
-                  <p className="text-xs text-gray-500">점</p>
+              ))}
+              {loading && (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            )}
-            <div ref={observerRef} className="h-4" />
+              )}
+              <div ref={observerRef} className="h-4" />
+            </div>
           </div>
         </CardContent>
       </Card>
