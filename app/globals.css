@@ -123,4 +123,29 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .font-semibold,
+  .font-bold,
+  .font-extrabold,
+  strong,
+  b {
+    font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+    letter-spacing: 0;
+    line-height: 1.25;
+    font-synthesis: none;
+  }
+
+  .font-semibold {
+    font-weight: 450 !important;
+  }
+
+  .font-bold,
+  strong,
+  b {
+    font-weight: 500 !important;
+  }
+
+  .font-extrabold {
+    font-weight: 600 !important;
+  }
 }

@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans_KR, JetBrains_Mono, Jua } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
+const ibmPlexSansKr = IBM_Plex_Sans_KR({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jua = Jua({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -25,9 +32,9 @@ export default function RootLayout({
   const currentYear = new Date().getFullYear();
 
   return (
-    <html lang="en">
+    <html lang="ko">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${ibmPlexSansKr.variable} ${jetBrainsMono.variable} ${jua.variable} antialiased min-h-screen flex flex-col`}
       >
         <main className="flex-1 pb-16">{children}</main>
         <footer className="fixed bottom-0 left-0 w-full border-t bg-white/90 backdrop-blur">
