@@ -30,6 +30,7 @@ export default function Rankings({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [userScore, setUserScore] = useState<number | null>(null);
+  const [userRank, setUserRank] = useState<number | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
 
@@ -66,6 +67,9 @@ export default function Rankings({
       if (response.ok) {
         const data = await response.json();
         setUserScore(data.totalScore);
+        if (typeof data.rank === "number") {
+          setUserRank(data.rank);
+        }
       }
     } catch (error) {
       console.error("Complete error:", error);
@@ -102,9 +106,10 @@ export default function Rankings({
     }
   }, [fetchRankings, hasMore, loading, page]);
 
-  const userRank = attemptId
+  const fallbackUserRank = attemptId
     ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
     : 0;
+  const displayedUserRank = userRank ?? fallbackUserRank;
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -124,8 +129,8 @@ export default function Rankings({
                 {userScore !== null ? userScore : "계산 중..."}점
               </p>
             </div>
-            {userRank > 0 && (
-              <p className="text-xl opacity-90">전체 순위: {userRank}위</p>
+            {displayedUserRank > 0 && (
+              <p className="text-xl opacity-90">전체 순위: {displayedUserRank}위</p>
             )}
             {onRestart && (
               <Button

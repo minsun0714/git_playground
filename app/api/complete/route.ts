@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       (sum, score) => sum + score,
       0,
     );
+    const completedAt = new Date().toISOString();
 
     // user_rankings 테이블에 응시 단위로 저장 (같은 응시 재호출 시에만 갱신)
     const { error: upsertError } = await supabase.from("user_rankings").upsert(
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
         attempt_id: attemptId,
         user_name: userName,
         total_score: totalScore,
-        completed_at: new Date().toISOString(),
+        completed_at: completedAt,
       },
       { onConflict: "attempt_id" },
     );
@@ -53,7 +54,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
 
-    return NextResponse.json({ totalScore });
+    const [{ count: higherScoreCount, error: higherScoreError },
+      { count: sameScoreEarlierCount, error: sameScoreEarlierError }] =
+      await Promise.all([
+        supabase
+          .from("user_rankings")
+          .select("attempt_id", { count: "exact", head: true })
+          .gt("total_score", totalScore),
+        supabase
+          .from("user_rankings")
+          .select("attempt_id", { count: "exact", head: true })
+          .eq("total_score", totalScore)
+          .lt("completed_at", completedAt),
+      ]);
+
+    if (higherScoreError || sameScoreEarlierError) {
+      console.error("Supabase rank calc error:", higherScoreError || sameScoreEarlierError);
+      return NextResponse.json({ totalScore });
+    }
+
+    const rank = (higherScoreCount || 0) + (sameScoreEarlierCount || 0) + 1;
+
+    return NextResponse.json({ totalScore, rank });
   } catch (error) {
     console.error("Complete API error:", error);
     return NextResponse.json(
