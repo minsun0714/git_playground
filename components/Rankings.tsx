@@ -34,10 +34,31 @@ export default function Rankings({
     null,
   );
   const listContainerRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<HTMLDivElement>(null);
   const userRowRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolledRef = useRef(false);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
+
+  const enqueueNextPage = useCallback(() => {
+    if (loading || !hasMore) {
+      return;
+    }
+
+    setPage((prev) => prev + 1);
+  }, [hasMore, loading]);
+
+  const handleContainerScroll = useCallback(() => {
+    const container = listContainerRef.current;
+    if (!container || loading || !hasMore) {
+      return;
+    }
+
+    const nearBottom =
+      container.scrollTop + container.clientHeight >= container.scrollHeight - 80;
+
+    if (nearBottom) {
+      enqueueNextPage();
+    }
+  }, [enqueueNextPage, hasMore, loading]);
 
   const fetchRankings = useCallback(async (pageNum: number) => {
     setLoading(true);
@@ -83,6 +104,7 @@ export default function Rankings({
 
   useEffect(() => {
     const initialize = async () => {
+      hasAutoScrolledRef.current = false;
       if (shouldShowResultCard) {
         await completeQuiz();
       }
@@ -94,31 +116,16 @@ export default function Rankings({
   }, [completeQuiz, fetchRankings, shouldShowResultCard]);
 
   useEffect(() => {
-    if (!listContainerRef.current) {
+    if (page <= 1) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { root: listContainerRef.current, threshold: 0.1 },
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, loading]);
+    void fetchRankings(page);
+  }, [fetchRankings, page]);
 
   useEffect(() => {
-    if (page > 1 && hasMore && !loading) {
-      fetchRankings(page);
-    }
-  }, [fetchRankings, hasMore, loading, page]);
+    handleContainerScroll();
+  }, [handleContainerScroll, rankings]);
 
   useEffect(() => {
     if (!attemptId || !shouldShowResultCard || loading) {
@@ -128,7 +135,7 @@ export default function Rankings({
     const hasCurrentAttempt = rankings.some((r) => r.attempt_id === attemptId);
 
     if (!hasCurrentAttempt && hasMore) {
-      setPage((prev) => prev + 1);
+      enqueueNextPage();
       return;
     }
 
@@ -136,7 +143,7 @@ export default function Rankings({
       userRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       hasAutoScrolledRef.current = true;
     }
-  }, [attemptId, hasMore, loading, rankings, shouldShowResultCard]);
+  }, [attemptId, enqueueNextPage, hasMore, loading, rankings, shouldShowResultCard]);
 
   const displayRanks = rankings.reduce<number[]>((acc, ranking, index) => {
     if (
@@ -165,6 +172,7 @@ export default function Rankings({
     return displayRanks[rankingIndex] || 0;
   })();
   const userRank = userRankFromList || userRankFromServer || 0;
+  const isLoadingMore = loading && page > 1;
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -220,7 +228,8 @@ export default function Rankings({
         <CardContent>
           <div
             ref={listContainerRef}
-            className="h-[420px] overflow-y-auto pr-1"
+            className="relative h-[420px] overflow-y-auto pr-1"
+            onScroll={handleContainerScroll}
           >
             <div className="space-y-2">
               {rankings.map((ranking, index) => (
@@ -270,12 +279,12 @@ export default function Rankings({
                   );
                 })()
               ))}
-              {loading && (
-                <div className="flex justify-center py-4">
+              <div className="h-4" />
+              {isLoadingMore && (
+                <div className="sticky bottom-0 z-10 flex justify-center bg-background/90 py-3 backdrop-blur-sm">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               )}
-              <div ref={observerRef} className="h-4" />
             </div>
           </div>
         </CardContent>

@@ -179,6 +179,7 @@ export default function QuizApp({ initialName }: QuizAppProps) {
     setCurrentStep(0);
     setStepData({});
     localStorage.removeItem(QUIZ_STORAGE_KEY);
+    router.push("/");
   };
 
   const handleGoHome = () => {

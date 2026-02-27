@@ -54,26 +54,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
 
-    const [{ count: higherScoreCount, error: higherScoreError },
-      { count: sameScoreEarlierCount, error: sameScoreEarlierError }] =
-      await Promise.all([
-        supabase
-          .from("user_rankings")
-          .select("attempt_id", { count: "exact", head: true })
-          .gt("total_score", totalScore),
-        supabase
-          .from("user_rankings")
-          .select("attempt_id", { count: "exact", head: true })
-          .eq("total_score", totalScore)
-          .lt("completed_at", completedAt),
-      ]);
+    const { data: higherScores, error: higherScoreError } = await supabase
+      .from("user_rankings")
+      .select("total_score")
+      .gt("total_score", totalScore);
 
-    if (higherScoreError || sameScoreEarlierError) {
-      console.error("Supabase rank calc error:", higherScoreError || sameScoreEarlierError);
+    if (higherScoreError) {
+      console.error("Supabase rank calc error:", higherScoreError);
       return NextResponse.json({ totalScore });
     }
 
-    const rank = (higherScoreCount || 0) + (sameScoreEarlierCount || 0) + 1;
+    const distinctHigherScoreCount = new Set(
+      (higherScores || []).map((row) => row.total_score),
+    ).size;
+    const rank = distinctHigherScoreCount + 1;
 
     return NextResponse.json({ totalScore, rank });
   } catch (error) {
