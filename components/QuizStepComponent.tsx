@@ -45,6 +45,11 @@ export default function QuizStepComponent({
   onComplete,
   onUpdateData,
 }: QuizStepComponentProps) {
+  const displayedTotalSteps = Math.max(totalSteps - 1, 1);
+  const displayedCurrentStep = Math.min(
+    Math.max(currentStep, 1),
+    displayedTotalSteps,
+  );
   const progressPercent =
     totalSteps > 0 ? Math.round(((currentStep + 1) / totalSteps) * 100) : 0;
 
@@ -174,17 +179,16 @@ export default function QuizStepComponent({
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-500">
-              Step {currentStep + 1} / {totalSteps}
+              Step {displayedCurrentStep} / {displayedTotalSteps}
             </span>
             <span className="text-sm font-medium text-blue-600">
               {userName}
             </span>
           </div>
+          <Progress value={progressPercent} />
           <CardTitle className="text-2xl">{step.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Progress value={progressPercent} />
-
           {/* 단계 설명 */}
           <div className="prose prose-sm max-w-none border rounded-lg p-4 bg-gray-50">
             <RichStepContent content={step.content} />
