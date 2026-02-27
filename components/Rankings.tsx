@@ -66,9 +66,26 @@ export default function Rankings({
       const response = await fetch(`/api/rankings?page=${pageNum}`);
       if (response.ok) {
         const data = await response.json();
-        setRankings((prev) =>
-          pageNum === 1 ? data.rankings : [...prev, ...data.rankings],
-        );
+        setRankings((prev) => {
+          const merged =
+            pageNum === 1 ? data.rankings : [...prev, ...data.rankings];
+
+          const dedupedByAttempt = new Map<string, UserRanking>();
+          for (const ranking of merged) {
+            dedupedByAttempt.set(ranking.attempt_id, ranking);
+          }
+
+          return Array.from(dedupedByAttempt.values()).sort((a, b) => {
+            if (b.total_score !== a.total_score) {
+              return b.total_score - a.total_score;
+            }
+
+            return (
+              new Date(a.completed_at).getTime() -
+              new Date(b.completed_at).getTime()
+            );
+          });
+        });
         setHasMore(data.hasMore);
       }
     } catch (error) {
