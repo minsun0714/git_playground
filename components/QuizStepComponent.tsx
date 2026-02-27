@@ -172,11 +172,11 @@ export default function QuizStepComponent({
           className="px-0 hover:bg-transparent"
           disabled={loading}
         >
-          &lt; 홈으로
+          &lt; Home
         </Button>
 
-        <div className="relative h-[4.6rem] w-44 shrink-0" aria-hidden>
-          <span className="absolute left-1/2 top-0 -translate-x-1/2 text-3xl leading-none transition-transform duration-300 hover:-translate-y-0.5">
+        <div className="relative -mb-6 h-[4rem] w-44 shrink-0" aria-hidden>
+          <span className="absolute left-1/2 top-2 -translate-x-1/2 text-3xl leading-none transition-transform duration-300 hover:-translate-y-0.5">
             ʕ•ᴥ•ʔ
           </span>
           <div className="absolute left-1/2 top-8 -translate-x-1/2 rounded-xl bg-background/80 px-3 py-1 text-sm font-semibold">
