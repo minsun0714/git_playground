@@ -34,7 +34,10 @@ export default function HomeNameEntry() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="home-name" className="block text-sm font-medium mb-2">
+            <label
+              htmlFor="home-name"
+              className="block text-sm font-medium mb-2"
+            >
               이름을 입력하세요
             </label>
             <Input

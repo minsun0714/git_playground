@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ActionModal from "@/components/ui/action-modal";
 import RichStepContent from "@/components/RichStepContent";
 import { QuizStep } from "@/lib/quiz-data";
 
@@ -20,17 +18,11 @@ export default function PreparationStep({
   onGoHome,
   onStartExam,
 }: PreparationStepProps) {
-  const [isHomeConfirmOpen, setIsHomeConfirmOpen] = useState(false);
-
-  const handleGoHomeClick = () => {
-    setIsHomeConfirmOpen(true);
-  };
-
   return (
     <div className="w-full max-w-4xl mx-auto space-y-3">
       <div className="flex justify-start">
         <Button
-          onClick={handleGoHomeClick}
+          onClick={onGoHome}
           variant="ghost"
           size="sm"
           className="px-0 hover:bg-transparent"
@@ -59,19 +51,6 @@ export default function PreparationStep({
           </div>
         </CardContent>
       </Card>
-
-      <ActionModal
-        open={isHomeConfirmOpen}
-        title="홈으로 이동"
-        description="홈으로 이동하면 지금까지 제출한 데이터가 모두 사라집니다. 계속하시겠습니까?"
-        confirmText="이동"
-        cancelText="취소"
-        onConfirm={() => {
-          setIsHomeConfirmOpen(false);
-          onGoHome();
-        }}
-        onCancel={() => setIsHomeConfirmOpen(false)}
-      />
     </div>
   );
 }

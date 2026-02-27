@@ -34,10 +34,32 @@ export default function Rankings({
     null,
   );
   const listContainerRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<HTMLDivElement>(null);
   const userRowRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolledRef = useRef(false);
   const shouldShowResultCard = showResultCard ?? Boolean(userName && attemptId);
+
+  const enqueueNextPage = useCallback(() => {
+    if (loading || !hasMore) {
+      return;
+    }
+
+    setPage((prev) => prev + 1);
+  }, [hasMore, loading]);
+
+  const handleContainerScroll = useCallback(() => {
+    const container = listContainerRef.current;
+    if (!container || loading || !hasMore) {
+      return;
+    }
+
+    const nearBottom =
+      container.scrollTop + container.clientHeight >=
+      container.scrollHeight - 80;
+
+    if (nearBottom) {
+      enqueueNextPage();
+    }
+  }, [enqueueNextPage, hasMore, loading]);
 
   const fetchRankings = useCallback(async (pageNum: number) => {
     setLoading(true);
@@ -45,9 +67,26 @@ export default function Rankings({
       const response = await fetch(`/api/rankings?page=${pageNum}`);
       if (response.ok) {
         const data = await response.json();
-        setRankings((prev) =>
-          pageNum === 1 ? data.rankings : [...prev, ...data.rankings],
-        );
+        setRankings((prev) => {
+          const merged =
+            pageNum === 1 ? data.rankings : [...prev, ...data.rankings];
+
+          const dedupedByAttempt = new Map<string, UserRanking>();
+          for (const ranking of merged) {
+            dedupedByAttempt.set(ranking.attempt_id, ranking);
+          }
+
+          return Array.from(dedupedByAttempt.values()).sort((a, b) => {
+            if (b.total_score !== a.total_score) {
+              return b.total_score - a.total_score;
+            }
+
+            return (
+              new Date(a.completed_at).getTime() -
+              new Date(b.completed_at).getTime()
+            );
+          });
+        });
         setHasMore(data.hasMore);
       }
     } catch (error) {
@@ -83,6 +122,7 @@ export default function Rankings({
 
   useEffect(() => {
     const initialize = async () => {
+      hasAutoScrolledRef.current = false;
       if (shouldShowResultCard) {
         await completeQuiz();
       }
@@ -94,31 +134,16 @@ export default function Rankings({
   }, [completeQuiz, fetchRankings, shouldShowResultCard]);
 
   useEffect(() => {
-    if (!listContainerRef.current) {
+    if (page <= 1) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { root: listContainerRef.current, threshold: 0.1 },
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, loading]);
+    void fetchRankings(page);
+  }, [fetchRankings, page]);
 
   useEffect(() => {
-    if (page > 1 && hasMore && !loading) {
-      fetchRankings(page);
-    }
-  }, [fetchRankings, hasMore, loading, page]);
+    handleContainerScroll();
+  }, [handleContainerScroll, rankings]);
 
   useEffect(() => {
     if (!attemptId || !shouldShowResultCard || loading) {
@@ -128,20 +153,55 @@ export default function Rankings({
     const hasCurrentAttempt = rankings.some((r) => r.attempt_id === attemptId);
 
     if (!hasCurrentAttempt && hasMore) {
-      setPage((prev) => prev + 1);
+      enqueueNextPage();
       return;
     }
 
-    if (hasCurrentAttempt && userRowRef.current && !hasAutoScrolledRef.current) {
-      userRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (
+      hasCurrentAttempt &&
+      userRowRef.current &&
+      !hasAutoScrolledRef.current
+    ) {
+      userRowRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       hasAutoScrolledRef.current = true;
     }
-  }, [attemptId, hasMore, loading, rankings, shouldShowResultCard]);
+  }, [
+    attemptId,
+    enqueueNextPage,
+    hasMore,
+    loading,
+    rankings,
+    shouldShowResultCard,
+  ]);
 
-  const userRankFromList = attemptId
-    ? rankings.findIndex((r) => r.attempt_id === attemptId) + 1
-    : 0;
-  const userRank = userRankFromServer ?? userRankFromList;
+  const displayRanks = rankings.reduce<number[]>((acc, ranking, index) => {
+    if (index > 0 && rankings[index - 1].total_score === ranking.total_score) {
+      acc.push(acc[index - 1]);
+    } else {
+      const previousRank = index > 0 ? acc[index - 1] : 0;
+      acc.push(previousRank + 1);
+    }
+
+    return acc;
+  }, []);
+
+  const userRankFromList = (() => {
+    if (!attemptId) {
+      return 0;
+    }
+
+    const rankingIndex = rankings.findIndex((r) => r.attempt_id === attemptId);
+    if (rankingIndex < 0) {
+      return 0;
+    }
+
+    return displayRanks[rankingIndex] || 0;
+  })();
+  const userRank = userRankFromList || userRankFromServer || 0;
+  const isLoadingMore = loading && page > 1;
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -197,56 +257,67 @@ export default function Rankings({
         <CardContent>
           <div
             ref={listContainerRef}
-            className="h-[420px] overflow-y-auto pr-1"
+            className="relative h-[420px] overflow-y-auto pr-1"
+            onScroll={handleContainerScroll}
           >
             <div className="space-y-2">
-              {rankings.map((ranking, index) => (
-                <div
-                  key={`${ranking.user_name}-${index}`}
-                  ref={ranking.attempt_id === attemptId ? userRowRef : undefined}
-                  className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
-                    ranking.attempt_id === attemptId
-                      ? "bg-primary/10 border-2 border-primary"
-                      : "bg-gray-50 hover:bg-gray-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
+              {rankings.map((ranking, index) =>
+                (() => {
+                  const displayRank = displayRanks[index] || index + 1;
+
+                  return (
                     <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
-                        index === 0
-                          ? "bg-yellow-400 text-yellow-900"
-                          : index === 1
-                            ? "bg-gray-300 text-gray-700"
-                            : index === 2
-                              ? "bg-orange-400 text-orange-900"
-                              : "bg-gray-200 text-gray-600"
+                      key={`${ranking.user_name}-${index}`}
+                      ref={
+                        ranking.attempt_id === attemptId
+                          ? userRowRef
+                          : undefined
+                      }
+                      className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
+                        ranking.attempt_id === attemptId
+                          ? "bg-primary/10 border-2 border-primary"
+                          : "bg-gray-50 hover:bg-gray-100"
                       }`}
                     >
-                      {index + 1}
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
+                            displayRank === 1
+                              ? "bg-yellow-400 text-yellow-900"
+                              : displayRank === 2
+                                ? "bg-gray-300 text-gray-700"
+                                : displayRank === 3
+                                  ? "bg-orange-400 text-orange-900"
+                                  : "bg-gray-200 text-gray-600"
+                          }`}
+                        >
+                          {displayRank}
+                        </div>
+                        <div>
+                          <p className="font-semibold">{ranking.user_name}</p>
+                          <p className="text-sm text-gray-500">
+                            {new Date(ranking.completed_at).toLocaleDateString(
+                              "ko-KR",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-primary">
+                          {ranking.total_score}
+                        </p>
+                        <p className="text-xs text-gray-500">점</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold">{ranking.user_name}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(ranking.completed_at).toLocaleDateString(
-                          "ko-KR",
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
-                      {ranking.total_score}
-                    </p>
-                    <p className="text-xs text-gray-500">점</p>
-                  </div>
-                </div>
-              ))}
-              {loading && (
-                <div className="flex justify-center py-4">
+                  );
+                })(),
+              )}
+              <div className="h-4" />
+              {isLoadingMore && (
+                <div className="sticky bottom-0 z-10 flex justify-center bg-background/90 py-3 backdrop-blur-sm">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               )}
-              <div ref={observerRef} className="h-4" />
             </div>
           </div>
         </CardContent>

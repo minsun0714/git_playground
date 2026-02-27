@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = 20;
+    const limit = 10;
     const offset = (page - 1) * limit;
 
     // 사용자별 총점 계산 및 랭킹 조회

@@ -95,19 +95,22 @@ export default function QuizStepComponent({
       return;
     }
 
-    // 모든 질문에 답변했는지 확인
-    const unanswered = step.questions.filter((q) => !answers[q.id]?.trim());
-    if (unanswered.length > 0) {
-      setAlertMessage("모든 질문에 답변해주세요.");
-      return;
-    }
-
     setLoading(true);
     const feedbackResults: Record<string, { score: number; feedback: string }> =
       {};
 
     try {
       for (const question of step.questions) {
+        const answer = answers[question.id]?.trim();
+
+        if (!answer) {
+          feedbackResults[question.id] = {
+            score: 0,
+            feedback: "미작성 답안은 0점 처리됩니다.",
+          };
+          continue;
+        }
+
         const response = await fetch("/api/grade", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -117,7 +120,7 @@ export default function QuizStepComponent({
             step: step.id,
             questionId: question.id,
             question: question.question,
-            answer: answers[question.id],
+            answer,
             correctAnswer: question.correctAnswer,
             maxScore: question.maxScore,
           }),
@@ -164,7 +167,7 @@ export default function QuizStepComponent({
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-3">
-      <div className="flex justify-start">
+      <div className="flex items-start justify-between">
         <Button
           onClick={handleGoHomeClick}
           variant="ghost"
@@ -172,18 +175,33 @@ export default function QuizStepComponent({
           className="px-0 hover:bg-transparent"
           disabled={loading}
         >
-          &lt; 홈으로
+          &lt; Home
         </Button>
+
+        <div className="relative -mb-6 h-[4rem] w-44 shrink-0" aria-hidden>
+          <span className="absolute left-1/2 top-2 -translate-x-1/2 text-3xl leading-none transition-transform duration-300 hover:-translate-y-0.5">
+            ʕ•ᴥ•ʔ
+          </span>
+          <div className="absolute left-1/2 top-8 -translate-x-1/2 rounded-xl bg-background/80 px-3 py-1 text-sm font-semibold">
+            {userName}
+          </div>
+          <span className="absolute left-9 top-[2.1rem] -rotate-12 text-lg leading-none">
+            ᕦ
+          </span>
+          <span className="absolute right-9 top-[2.1rem] rotate-12 text-lg leading-none">
+            ᕤ
+          </span>
+          <div className="absolute left-[36%] top-[1.9rem] h-2 w-px bg-foreground/20" />
+          <div className="absolute left-[64%] top-[1.9rem] h-2 w-px bg-foreground/20" />
+          <div className="sr-only">응시자: {userName}</div>
+        </div>
       </div>
 
       <Card className="shadow-xl">
         <CardHeader>
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <span className="text-sm text-gray-500">
               Step {displayedCurrentStep} / {displayedTotalSteps}
-            </span>
-            <span className="text-sm font-medium text-blue-600">
-              {userName}
             </span>
           </div>
           <Progress value={progressPercent} />
@@ -274,7 +292,7 @@ export default function QuizStepComponent({
                     ) : isSubmitted ? (
                       `재제출 (${2 - submitCount}회 남음)`
                     ) : (
-                      "제출"
+                      `제출 (${2 - submitCount}회 남음)`
                     )}
                   </Button>
                   <Button
