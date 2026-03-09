@@ -146,7 +146,7 @@ git init
         type: "long",
         correctAnswer:
           "git restore --staged file. stage area에서는 변경사항을 내리되 tracked 상태가 유지되지만, working directory에는 변경 사항 유지",
-        maxScore: 10,
+        maxScore: 5,
       },
       {
         id: "step4-q4",
@@ -155,7 +155,7 @@ git init
         type: "long",
         correctAnswer:
           "git rm --cached file. stage area에서는 변경사항을 내리되 untracked 상태로 변경하지만, working directory에는 변경 사항을 유지",
-        maxScore: 10,
+        maxScore: 5,
       },
     ],
   },
@@ -275,7 +275,7 @@ git init
         type: "long",
         correctAnswer:
           '악마 = reset 요정. reset은 브랜치 포인터를 과거로 이동시킴. 이미 push된 커밋 히스토리를 변경함. 동료의 로컬 히스토리와 충돌 발생. force push 필요 → 협업 지옥 시작. reset은 히스토리를 "지워버리는" 행위다.',
-        maxScore: 10,
+        maxScore: 5,
       },
       {
         id: "step8-q2",
@@ -283,7 +283,7 @@ git init
         type: "long",
         correctAnswer:
           '선택 = revert 요정. 기존 커밋은 그대로 둔다. 새로운 "취소 커밋"을 하나 더 만든다. 히스토리 보존. 협업 안전. revert는 기록을 지우지 않고 되돌린다.',
-        maxScore: 10,
+        maxScore: 5,
       },
     ],
   },
