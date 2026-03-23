@@ -16,7 +16,7 @@ export interface Question {
 export const quizSteps: QuizStep[] = [
   {
     id: 0,
-    title: "Step 0 — 과제 전 준비 (.gitignore)",
+    title: "Step 0 — 과제 전 준비",
     content: `git_study 프로젝트를 과제 폴더 안에 만들어주세요.
 프로젝트 폴더 내부 경로로 들어와서 \`git init\`을 터미널에 입력
 
@@ -45,8 +45,7 @@ git init
         question:
           "Working directory, Staging area, Repository 중 어디에 변경 사항이 존재하는가?",
         type: "long",
-        correctAnswer:
-          "Working directory. 아직 stage area에 add하지 않아서 Working directory에서 untracked file로 남아있는 상태",
+        correctAnswer: "Working directory",
         maxScore: 5,
       },
     ],
@@ -72,8 +71,7 @@ git init
         question:
           "변경사항은 untracked인가 tracked인가? (git에 의해 추적되기 시작했는가?)",
         type: "short",
-        correctAnswer:
-          "tracked. add되어 커밋할 파일이 생겼다는 것은, file이 git에 의해 추적되기 시작한 동시에 stage area에 file이 복사되었다는 것.",
+        correctAnswer: "tracked 상태가 된다.",
         maxScore: 5,
       },
       {
@@ -102,14 +100,13 @@ git init
         question:
           "commit까지 했을 시점에 stage area와 repository에는 각각 무엇이 있는가?",
         type: "long",
-        correctAnswer:
-          "stage area는 비워지고, repository에 커밋이 저장됨. commit은 stage area의 스냅샷을 repository에 저장한다.",
+        correctAnswer: "stage area는 비워지고, repository에 커밋이 저장됨.",
         maxScore: 5,
       },
       {
         id: "step3-q2",
         question:
-          "결론적으로, commit은 Working directory를 저장하는가, Stage Area를 저장하는가?",
+          "결론적으로, commit은 Working directory를 저장하는가, stage area를 저장하는가?",
         type: "short",
         correctAnswer: "Stage Area를 저장한다.",
         maxScore: 5,
@@ -126,10 +123,10 @@ git init
       {
         id: "step4-q1",
         question:
-          "이때 무엇을 써야 하는가? 그리고 왜 reset이 아닌 restore인가?",
+          "이때 무엇을 써야 하는가? 그리고 왜 reset이 아닌 restore인가? reset과 restore를 비교하여 설명하라.",
         type: "long",
         correctAnswer:
-          "git restore file을 사용. working directory에서의 변경사항만 취소하는 작업이기 때문이다.",
+          "git restore file을 사용. working directory에서의 변경사항만 취소하는 작업이기 때문이다. reset은 HEAD 단위로 변경사항을 취소하는 것이고, restore는 파일 단위로 변경사항을 취소하는 것이다.",
         maxScore: 5,
       },
       {
@@ -145,7 +142,7 @@ git init
           "git add를 먼저 한 다음 stage area에서 내리되 tracked 상태로 유지하려면 어떤 명령을 사용해야 하는가? 어떤 공간이 변경되는가?",
         type: "long",
         correctAnswer:
-          "git restore --staged file. stage area에서는 변경사항을 내리되 tracked 상태가 유지되지만, working directory에는 변경 사항 유지",
+          "git restore --staged file. stage area에서는 변경사항을 내린다.",
         maxScore: 5,
       },
       {
@@ -168,7 +165,7 @@ git init
       {
         id: "step5-q1",
         question:
-          "왜 reset (--soft, --mixed, --hard)은 에러를 뱉을까? (힌트: 위 3개 명령어는 가장 최신 커밋의 부모 커밋으로 HEAD를 이동시킨다)",
+          "왜 reset은 에러를 뱉을까? (힌트: 위 3개 명령어는 가장 최신 커밋의 부모 커밋으로 HEAD를 이동시킨다)",
         type: "long",
         correctAnswer:
           "HEAD를 부모 커밋 (직전 커밋)으로 이동시키려고 했는데 지금까지 커밋이 1건 밖에 없어서 최신 커밋의 부모 커밋이 존재하지 않음. 따라서 reset이 불가능.",
@@ -188,7 +185,7 @@ git init
         question: "soft vs mixed vs hard의 차이는 무엇인가?",
         type: "long",
         correctAnswer:
-          "soft: 브랜치 범위는 바뀌지만 working directory와 staging area에는 아무런 변화도 없음. mixed: 브랜치 범위, staging area가 바뀌지만 working directory에는 아무런 변화도 없음 (최신 커밋을 바꾸고 싶을 때 주로 사용). hard: 브랜치 범위, staging area, working directory 모두 바뀜.",
+          "soft: staging area와 working directory는 유지. mixed: staging area를 해당 커밋 상태로 초기화, working directory는 유지. hard: staging area와 working directory를 모두 해당 커밋 상태로 강제 동기화",
         maxScore: 5,
       },
     ],
@@ -215,7 +212,7 @@ git init
           '다시 "next change"가 가장 최신 커밋이 되도록 되돌리려면 어떻게 해야 하는가?',
         type: "long",
         correctAnswer:
-          "Step 5에서 학습한 reset을 이용하여 과거 커밋으로 되돌아갈 수 있다. git reset --hard <<커밋 해시>>",
+          "Step 5에서 학습한 reset을 이용하여 과거 커밋으로 되돌아갈 수 있다. reset 명령어를 사용하여 되돌릴 수 있다.",
         maxScore: 5,
       },
     ],
@@ -263,7 +260,8 @@ git init
     id: 8,
     title: "Step 8 — revert (운영 사고 시뮬레이션)",
     content: `앞서 dev 브랜치를 머지했다.
-그런데 알고보니 "collision"이라는 단어는 치명적인 독극물을 머금은 버그가 있는 단어이므로, main 브랜치에 들어가 있어서는 안된다고 한다.
+이미 이 커밋을 기반으로 여러 동료가 추가 커밋을 쌓은 상태이다.
+히스토리를 변경하면 안 된다. force push 또한 금지된 상황이다.
 
 당신이 다른 사람들과 협업을 하고 있는 개발자라고 가정하자.
 만약 github에 지금까지의 commit 내역을 push했고 동료들이 이미 이를 pull 받아간 상태라고 가정해보자.`,
@@ -273,16 +271,16 @@ git init
         question:
           "reset 요정과 revert 요정이 나타나 양쪽 어깨에서 속삭인다. 두 요정 중 숨어있는 악마를 찾아 이유도 함께 제시하라.",
         type: "long",
-        correctAnswer:
-          '악마 = reset 요정. reset은 브랜치 포인터를 과거로 이동시킴. 이미 push된 커밋 히스토리를 변경함. 동료의 로컬 히스토리와 충돌 발생. force push 필요 → 협업 지옥 시작. reset은 히스토리를 "지워버리는" 행위다.',
+        correctAnswer: `악마 = reset 요정. reset은 HEAD를 과거로 이동시키며 히스토리를 재작성한다.
+          이미 push된 커밋을 변경하게 되어 원격 저장소와 로컬 저장소 간 히스토리가 불일치하게 된다.
+          이로 인해 force push가 필요하고, 동료들의 작업 기반을 깨뜨려 협업 충돌을 유발한다.`,
         maxScore: 5,
       },
       {
         id: "step8-q2",
         question: "악마를 찾았으니 대응방안을 제시하라.",
         type: "long",
-        correctAnswer:
-          '선택 = revert 요정. 기존 커밋은 그대로 둔다. 새로운 "취소 커밋"을 하나 더 만든다. 히스토리 보존. 협업 안전. revert는 기록을 지우지 않고 되돌린다.',
+        correctAnswer: `revert는 기존 커밋을 유지하면서 해당 변경을 되돌리는 새로운 커밋을 생성한다.`,
         maxScore: 5,
       },
     ],
